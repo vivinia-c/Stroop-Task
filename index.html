@@ -59,7 +59,22 @@ function createWordTL() {
 
 var stroop_timeline = createWordTL();
 
+const save_data_trial = {
+type: jsPsychPipe,
+action: "save",
+experiment_id: "OxGxEoRzNDwg",
+filename: "test_data.csv",
+data_string: ()=>jsPsych.data.get().csv(),
+on_finish: function(data){alert(data.result.message)}
+};
+
+const end_trial = {
+type: jsPsychHtmlKeyboardResponse,
+stimulus: 'Nothing left to do here.'
+};
+
 // Run the experiment
-jsPsych.run([stroop_timeline]);
+jsPsych.run([stroop_timeline, save_data_trial, end_trial]);
+    
 </script>
 </html>
