@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stroop Task Experiment</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" 
+    rel="stylesheet" type="text/css"/>
+</head>
+<body></body>
+<script>
+const jsPsych = initJsPsych();
+
+function createWordTL() {
+    return {
+        timeline: [
+            { 
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: '<p>Press any key when ready for the next trial.</p>',
+                choices: "ALL_KEYS"
+            },
+            { 
+                type: jsPsychHtmlButtonResponse,
+                stimulus: function() {
+                    var current_trial = jsPsych.timelineVariable("word_color_pair");
+                    return `<p style="color:${current_trial.color}; font-size:40px;">${current_trial.word.toUpperCase()}</p>`;
+                },
+                choices: ["MATCH", "NOT"],
+                data: function() {
+                    var current_trial = jsPsych.timelineVariable("word_color_pair");
+                    return {
+                        word: current_trial.word,
+                        color: current_trial.color,
+                        condition: current_trial.word === current_trial.color ? "congruent" : "incongruent"
+                    };
+                },
+                on_finish: function(data) {
+                    data.correct = (data.response === 0 && data.condition === "congruent") || 
+                                   (data.response === 1 && data.condition === "incongruent");
+                }
+            }
+        ],
+        timeline_variables: [
+            { word_color_pair: { word: "red", color: "red" } },
+            { word_color_pair: { word: "red", color: "blue" } },
+            { word_color_pair: { word: "red", color: "green" } },
+            { word_color_pair: { word: "blue", color: "red" } },
+            { word_color_pair: { word: "blue", color: "blue" } },
+            { word_color_pair: { word: "blue", color: "green" } },
+            { word_color_pair: { word: "green", color: "red" } },
+            { word_color_pair: { word: "green", color: "blue" } },
+            { word_color_pair: { word: "green", color: "green" } }
+        ],
+        randomize_order: true, // Randomize the trials
+        repetitions: 2 // Each trial is repeated 2 times
+    };
+}
+
+var stroop_timeline = createWordTL();
+
+// Run the experiment
+jsPsych.run([stroop_timeline]);
+</script>
+</html>
